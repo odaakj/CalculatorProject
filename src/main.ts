@@ -2,6 +2,7 @@ let currentInput: string = "";
 let lastValue: number | null = null;
 let lastOp: ("+" | "-" | "*" | "/") | null = null;
 let justComputed: boolean = false;
+let errorState = false;
 
 const displayEl = document.querySelector(".display") as HTMLInputElement;
 const scope = document.querySelector(".calculator") as HTMLElement;
@@ -9,6 +10,12 @@ const scope = document.querySelector(".calculator") as HTMLElement;
 scope.addEventListener("click", (e: MouseEvent) => {
   const target = e.target as HTMLElement;
   const btn = target.closest("button");
+
+  if (errorState) {
+    handleClearAll();
+    errorState = false;
+  }
+
   if (!btn) return;
 
   const digit = btn.dataset.digit;
@@ -89,12 +96,13 @@ function handleOperator(symbol: string): void {
     if (lastValue === null) {
       lastValue = n;
     } else if (lastOp) {
-      lastValue = apply(lastValue, n, lastOp);
+      const res = apply(lastValue, n, lastOp);
+      if (errorState || !isFinite(res)) return;
+      lastValue = res;
     } else {
       lastValue = n;
     }
   } else {
-    // Bytt bare operator dersom vi allerede har en verdi
     if (lastValue !== null) {
       lastOp = op;
       updateDisplay(renderExpression());
@@ -104,7 +112,7 @@ function handleOperator(symbol: string): void {
 
   lastOp = op;
   justComputed = false;
-  updateDisplay(renderExpression()); // viser f.eks. "5 +"
+  updateDisplay(renderExpression());
 }
 
 function handleEquals(): void {
@@ -112,17 +120,21 @@ function handleEquals(): void {
 
   if (lastValue !== null && lastOp !== null && n !== null) {
     const rawResult = apply(lastValue, n, lastOp);
+
+    if (errorState || !isFinite(rawResult)) {
+      lastOp = null;
+      justComputed = false;
+      return;
+    }
+
     const result = round4(rawResult);
     const expression =
-    `${toMax4Str(lastValue)} ${displaySymbol(lastOp)} ${toMax4Str(n)} = ${toMax4Str(result)}`;
+      `${lastValue} ${displaySymbol(lastOp)} ${n} = ${toMax4Str(result)}`;
     updateDisplay(expression);
-    // Enables chaining calculations
     lastValue = result;
   } else {
     const v = lastValue ?? n ?? 0;
-    const r = round4(v);
     updateDisplay(lastValue ?? n ?? 0);
-    lastValue = r;
   }
 
   lastOp = null;
@@ -135,14 +147,20 @@ function apply(a: number, b: number, op: "+" | "-" | "*" | "/"): number {
     case "+": return a + b;
     case "-": return a - b;
     case "*": return a * b;
-    case "/": return b === 0 ? NaN : a / b;
+    case "/": 
+      if (b === 0) {
+        updateDisplay("You cannot divide by zero!");
+        errorState = true;
+        return NaN;
+      }
+      return a / b;
   }
 }
 
 // ---------- Clear ----------
 function handleClearEntry(): void {
   currentInput = "";
-  updateDisplay(renderExpression()); // viser f.eks. bare "5 +" igjen
+  updateDisplay(renderExpression());
 }
 
 function handleClearAll(): void {

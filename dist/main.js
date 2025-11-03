@@ -3,11 +3,16 @@ let currentInput = "";
 let lastValue = null;
 let lastOp = null;
 let justComputed = false;
+let errorState = false;
 const displayEl = document.querySelector(".display");
 const scope = document.querySelector(".calculator");
 scope.addEventListener("click", (e) => {
     const target = e.target;
     const btn = target.closest("button");
+    if (errorState) {
+        handleClearAll();
+        errorState = false;
+    }
     if (!btn)
         return;
     const digit = btn.dataset.digit;
@@ -106,14 +111,16 @@ function handleOperator(symbol) {
             lastValue = n;
         }
         else if (lastOp) {
-            lastValue = apply(lastValue, n, lastOp);
+            const res = apply(lastValue, n, lastOp);
+            if (errorState || !isFinite(res))
+                return;
+            lastValue = res;
         }
         else {
             lastValue = n;
         }
     }
     else {
-        // Bytt bare operator dersom vi allerede har en verdi
         if (lastValue !== null) {
             lastOp = op;
             updateDisplay(renderExpression());
@@ -122,23 +129,25 @@ function handleOperator(symbol) {
     }
     lastOp = op;
     justComputed = false;
-    updateDisplay(renderExpression()); // viser f.eks. "5 +"
+    updateDisplay(renderExpression());
 }
 function handleEquals() {
     const n = commitInput();
     if (lastValue !== null && lastOp !== null && n !== null) {
         const rawResult = apply(lastValue, n, lastOp);
+        if (errorState || !isFinite(rawResult)) {
+            lastOp = null;
+            justComputed = false;
+            return;
+        }
         const result = round4(rawResult);
-        const expression = `${toMax4Str(lastValue)} ${displaySymbol(lastOp)} ${toMax4Str(n)} = ${toMax4Str(result)}`;
+        const expression = `${lastValue} ${displaySymbol(lastOp)} ${n} = ${toMax4Str(result)}`;
         updateDisplay(expression);
-        // Enables chaining calculations
         lastValue = result;
     }
     else {
         const v = lastValue ?? n ?? 0;
-        const r = round4(v);
         updateDisplay(lastValue ?? n ?? 0);
-        lastValue = r;
     }
     lastOp = null;
     justComputed = true;
@@ -149,13 +158,19 @@ function apply(a, b, op) {
         case "+": return a + b;
         case "-": return a - b;
         case "*": return a * b;
-        case "/": return b === 0 ? NaN : a / b;
+        case "/":
+            if (b === 0) {
+                updateDisplay("You cannot divide by zero!");
+                errorState = true;
+                return NaN;
+            }
+            return a / b;
     }
 }
 // ---------- Clear ----------
 function handleClearEntry() {
     currentInput = "";
-    updateDisplay(renderExpression()); // viser f.eks. bare "5 +" igjen
+    updateDisplay(renderExpression());
 }
 function handleClearAll() {
     currentInput = "";
