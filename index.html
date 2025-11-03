@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="no">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Count on me - Calculator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+    <main class="homepage">
+        <section class="calculator">
+            <!-- Header -->
+            <h1 class="title">Count On Me</h1>
+            <p class="description">Enjoy :)</p>
+
+            <!-- Top row-->
+            <div class="top-row">
+                <input type="text" class="display" disabled />
+                <div class="clear-btns">
+                    <button class="btn clear" data-action="clearEntry">C</button>
+                    <button class="btn clear-all" data-action="clearAll">AC</button>
+                </div>
+            </div>
+
+            <div class="calculations">
+                <!-- Main buttons-->
+                <div class="main-keys">
+                    <!-- Numbers, point and equals-->
+                    <div class="numbers-grid">
+                        <button class="btn" data-digit="1">1</button>
+                        <button class="btn" data-digit="2">2</button>
+                        <button class="btn" data-digit="3">3</button>
+                        <button class="btn" data-digit="4">4</button>
+                        <button class="btn" data-digit="5">5</button>
+                        <button class="btn" data-digit="6">6</button>
+                        <button class="btn" data-digit="7">7</button>
+                        <button class="btn" data-digit="8">8</button>
+                        <button class="btn" data-digit="9">9</button>
+                        <button class="btn" data-cmd=".">.</button>
+                        <button class="btn" data-digit="0">0</button>
+                        <button class="btn equals" data-action="equals">=</button>
+                    </div>
+
+                    <!-- Basic calculations-->
+                    <div class="basic-calc-grid">
+                        <button class="btn add" data-op="+">+</button>
+                        <button class="btn sub" data-op="-">-</button>
+                        <button class="btn mul" data-op="x">x</button>
+                        <button class="btn div" data-op="÷">÷</button>
+                    </div>
+                </div>
+
+                <!-- Love calculations -->
+                <div class="love-in-the-air">
+                    <input type="checkbox" id="toggle-love" />
+                    <label for="toggle-love" class="dropdown-label">
+                        <img src="icons/dropdown.svg" alt="open"  class="icon icon-open" />
+                        <img src="icons/close.png"    alt="close" class="icon icon-close" />
+                        <span>Made with love</span> 
+                    </label>
+
+                    <div class="dropdown-content">
+                        <p>Write two names to calculate if they're a love match ❤️</p>
+                        <div class="love-actions">
+                            <div class="love-inputs">
+                                <div class="name-input">
+                                    <label for="name1">Name 1:</label>
+                                    <input type="text" id="name1" placeholder="Enter first name" />
+                                </div>
+                                <div class="name-input">
+                                    <label for="name2">Name 2:</label>
+                                    <input type="text" id="name2" placeholder="Enter second name" />
+                                </div>
+                            </div>
+                            <button class="btn love-calc" data-action="loveCalc">Calculate Love %</button>
+                        </div>
+                        <div class="love-display">
+                            <input type="text" class="love-result" id="loveResult" placeholder="Your Love Score is ..." readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="dist/main.js" defer></script>
+</body>
+</html>
