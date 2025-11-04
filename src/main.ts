@@ -134,7 +134,7 @@ function handleEquals(): void {
     lastValue = result;
   } else {
     const v = lastValue ?? n ?? 0;
-    updateDisplay(lastValue ?? n ?? 0);
+    updateDisplay(v);
   }
 
   lastOp = null;
