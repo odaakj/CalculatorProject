@@ -18,6 +18,8 @@ Inside the terminal, run:
 
 ```bash
 git clone <https://github.com/username/CalculatorProject.git>
+cd CalculatorProject
+npm install
 ```
 
 *Replace `username` with your actual GitHub username*
